@@ -10,10 +10,10 @@ class Exchange extends StatefulWidget {
 }
 
 class ExchangeState extends State<Exchange> {
-  String amount = '';
   String currencyFrom = 'EUR';
   String currencyTo = 'USD';
-  String result = '';
+  String amount;
+  String result;
   final String url = 'https://exchangeratesapi.io/api/latest';
 
   Future fetchData(String currencyFrom, String currencyTo) async {
@@ -30,7 +30,7 @@ class ExchangeState extends State<Exchange> {
   }
 
   void iterateMapEntry(key, value) {
-    print(value + 1);
+    updateResult((value * double.parse(amount)).toString());
   }
 
   void updateAmount(value) {
@@ -42,17 +42,22 @@ class ExchangeState extends State<Exchange> {
   void updateCurrencyFrom(value) {
     setState(() {
       currencyFrom = value;
+      result = '';
     });
   }
 
   void updateCurrencyTo(value) {
     setState(() {
       currencyTo = value;
+      result = '';
     });
   }
 
-  void handleClick(value) {
+  void handleClick() {
     fetchData(currencyFrom, currencyTo);
+  }
+
+  void updateResult(value) {
     setState(() {
       result = value;
     });
@@ -71,7 +76,7 @@ class ExchangeState extends State<Exchange> {
         Expanded(
           child: TextField(
             decoration: InputDecoration(
-              labelText: 'Type the amount',
+              labelText: 'Type amount',
             ),
             onChanged: (value) {
               updateAmount(value);
@@ -84,23 +89,27 @@ class ExchangeState extends State<Exchange> {
     var dropDowns = Row(
       children: [
         Expanded(
-          child: DropdownButton(
-            hint: Text('From'),
-            value: currencyFrom,
-            items: currencies,
-            onChanged: (value) {
-              updateCurrencyFrom(value);
-            },
+          child: Container(
+            margin: EdgeInsets.fromLTRB(0.0, 20.0, 40.0, 0.0),
+            child: DropdownButton(
+              value: currencyFrom,
+              items: currencies,
+              onChanged: (value) {
+                updateCurrencyFrom(value);
+              },
+            ),
           ),
         ),
         Expanded(
-          child: DropdownButton(
-            hint: Text('To'),
-            value: currencyTo,
-            items: currencies,
-            onChanged: (value) {
-              updateCurrencyTo(value);
-            },
+          child: Container(
+            margin: EdgeInsets.fromLTRB(40.0, 20.0, 0.0, 0.0),
+            child: DropdownButton(
+              value: currencyTo,
+              items: currencies,
+              onChanged: (value) {
+                updateCurrencyTo(value);
+              },
+            ),
           ),
         )
       ],
@@ -109,7 +118,16 @@ class ExchangeState extends State<Exchange> {
     var message = Row(
       children: [
         Expanded(
-          child: Text('$result'),
+          child: Container(
+            margin: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+            decoration: BoxDecoration(color: Colors.black12),
+            height: 60.0,
+            alignment: Alignment(0.0, 0.0),
+            child: Text(result, style: TextStyle(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold
+            )),
+          )
         )
       ],
     );
@@ -127,7 +145,7 @@ class ExchangeState extends State<Exchange> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          handleClick(amount);
+          handleClick();
         },
         child: Icon(Icons.monetization_on)
       ),  
