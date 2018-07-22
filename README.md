@@ -1,6 +1,6 @@
-# exchange_flutter
+# Exchange Flutter
 
-A new Flutter project.
+My first Flutter project.
 
 ## Getting Started
 
