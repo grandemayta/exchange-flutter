@@ -12,8 +12,8 @@ class Exchange extends StatefulWidget {
 class ExchangeState extends State<Exchange> {
   String currencyFrom = 'EUR';
   String currencyTo = 'USD';
-  String amount;
-  String result;
+  String amount = '';
+  String result = '';
   final String url = 'https://exchangeratesapi.io/api/latest';
 
   Future fetchData(String currencyFrom, String currencyTo) async {
@@ -23,14 +23,18 @@ class ExchangeState extends State<Exchange> {
       var data = ExchangeModel.fromJson(json.decode(response.body));
       var rate = data.rates;
       rate.forEach(iterateMapEntry);
-      print(rate);
+    } else if (response.statusCode == 400) {
+      var data = ExchangeModel.fromJson(json.decode(response.body));
+      var error = data.error;
+      updateResult(error);
+
     } else {
       throw Exception('Failed http call!');
     }
   }
 
   void iterateMapEntry(key, value) {
-    updateResult((value * double.parse(amount)).toString());
+    updateResult((value * double.parse(amount)).toStringAsFixed(2));
   }
 
   void updateAmount(value) {
@@ -54,7 +58,9 @@ class ExchangeState extends State<Exchange> {
   }
 
   void handleClick() {
-    fetchData(currencyFrom, currencyTo);
+    if (amount.length > 0) {
+      fetchData(currencyFrom, currencyTo);
+    }
   }
 
   void updateResult(value) {
@@ -65,18 +71,36 @@ class ExchangeState extends State<Exchange> {
 
   @override
   Widget build(BuildContext context) {
+
     final currencies = [
       new DropdownMenuItem<String>(value: 'EUR', child: Text('EUR')),
       new DropdownMenuItem<String>(value: 'USD', child: Text('USD')),
       new DropdownMenuItem<String>(value: 'CHF', child: Text('CHF'))
     ].toList();
 
+    Widget resultChild;
+
+    if (result != '') {
+      resultChild = Container(
+        margin: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+        decoration: BoxDecoration(color: Colors.black12),
+        height: 50.0,
+        alignment: Alignment(0.0, 0.0),
+        child: Text(result, style: TextStyle(
+          fontSize: 22.0,
+          fontWeight: FontWeight.bold
+        )),
+      );
+    } else {
+      resultChild = Container();
+    }
+
     var textField = Row(
       children: [
         Expanded(
           child: TextField(
             decoration: InputDecoration(
-              labelText: 'Type amount',
+              labelText: 'Type amount', 
             ),
             onChanged: (value) {
               updateAmount(value);
@@ -118,15 +142,40 @@ class ExchangeState extends State<Exchange> {
     var message = Row(
       children: [
         Expanded(
+          child: resultChild
+        )
+      ],
+    );
+
+    var button = Row(
+      children: [
+        Expanded(
           child: Container(
-            margin: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
-            decoration: BoxDecoration(color: Colors.black12),
-            height: 60.0,
-            alignment: Alignment(0.0, 0.0),
-            child: Text(result, style: TextStyle(
-              fontSize: 22.0,
-              fontWeight: FontWeight.bold
-            )),
+            margin: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
+            child: RaisedButton(
+              child: Text('Calculate'),
+              color: Colors.lightBlueAccent,
+              textColor: Colors.white,
+              padding: EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
+              onPressed: () {
+                handleClick();
+              },
+            )
+          )
+        )
+      ],
+    );
+
+    var label = Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+            child: Text(
+              'Developed by GABRIEL MAYTA', 
+              style: TextStyle(fontSize: 14.0),
+              textAlign: TextAlign.center
+            )
           )
         )
       ],
@@ -139,16 +188,12 @@ class ExchangeState extends State<Exchange> {
           children: [
             textField,
             dropDowns,
+            button,
             message
           ],
         )
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          handleClick();
-        },
-        child: Icon(Icons.monetization_on)
-      ),  
+      bottomNavigationBar: label 
     );
   }
 }
