@@ -97,10 +97,10 @@ class ExchangeState extends State<Exchange> {
 
     var textField = Row(
       children: [
-        Expanded(
+         Expanded(
           child: TextField(
             decoration: InputDecoration(
-              labelText: 'Type amount', 
+              labelText: 'Type amount'
             ),
             onChanged: (value) {
               updateAmount(value);
@@ -182,7 +182,7 @@ class ExchangeState extends State<Exchange> {
     );
 
     return Scaffold(
-      body: Container(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
