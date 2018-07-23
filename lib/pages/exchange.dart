@@ -69,6 +69,10 @@ class ExchangeState extends State<Exchange> {
     });
   }
 
+  void goTo(page) {
+    Navigator.pushNamed(context, '/$page');
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -82,7 +86,7 @@ class ExchangeState extends State<Exchange> {
 
     if (result != '') {
       resultChild = Container(
-        margin: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+        margin: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
         decoration: BoxDecoration(color: Colors.black12),
         height: 50.0,
         alignment: Alignment(0.0, 0.0),
@@ -102,9 +106,7 @@ class ExchangeState extends State<Exchange> {
             decoration: InputDecoration(
               labelText: 'Type amount'
             ),
-            onChanged: (value) {
-              updateAmount(value);
-            },
+            onChanged: (value) => updateAmount(value)
           ),
         )
       ],
@@ -151,30 +153,12 @@ class ExchangeState extends State<Exchange> {
       children: [
         Expanded(
           child: Container(
-            margin: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
             child: RaisedButton(
               child: Text('Calculate'),
               color: Colors.lightBlueAccent,
               textColor: Colors.white,
               padding: EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
-              onPressed: () {
-                handleClick();
-              },
-            )
-          )
-        )
-      ],
-    );
-
-    var label = Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
-            child: Text(
-              'Developed by GABRIEL MAYTA', 
-              style: TextStyle(fontSize: 14.0),
-              textAlign: TextAlign.center
+              onPressed: () => handleClick()
             )
           )
         )
@@ -182,18 +166,26 @@ class ExchangeState extends State<Exchange> {
     );
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Exchange Flutter'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.info),
+            onPressed: () => goTo('credits')
+          )
+        ]
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
             textField,
             dropDowns,
-            button,
             message
           ],
         )
       ),
-      bottomNavigationBar: label 
+      bottomNavigationBar: button 
     );
   }
 }
